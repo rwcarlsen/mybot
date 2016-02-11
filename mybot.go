@@ -44,7 +44,7 @@ func main() {
 		"All are behaving within acceptable paremeters.",
 		"That biondo - he's a bit of trouble...",
 		"Just another day in CNERG.",
-		"I heard Pat got engaged to a state!",
+		"I heard Pat got engaged to a southern state!",
 	}
 
 	for {
@@ -55,26 +55,31 @@ func main() {
 			continue
 		}
 
-		switch m.Type {
-		case "message":
-			if strings.Contains(m.Text, self.Name) && m.User != usermap["r"] {
+		lowertext := strings.ToLower(m.Text)
+		if m.Type != "message" {
+			continue
+		}
+
+		switch {
+		case m.User == usermap["shriwise"]:
+			i := rand.Intn(len(pattext))
+			m.Text = pattext[i]
+			postMessage(ws, m)
+		case m.User == usermap["r"]:
+			if strings.Contains(lowertext, self.Name) && strings.Contains(m.Text, "?") {
+				if strings.Contains(lowertext, "ready") {
+					m.Text = "Locked and loaded."
+					postMessage(ws, m)
+				} else {
+					i := rand.Intn(len(robtext))
+					m.Text = robtext[i]
+					postMessage(ws, m)
+				}
+			}
+		default:
+			if strings.Contains(lowertext, self.Name) {
 				m.Text = "Careful what you say - I am watching..."
 				postMessage(ws, m)
-			}
-
-			if strings.Contains(m.Text, self.Name) && m.User == usermap["r"] {
-				i := rand.Intn(len(robtext))
-				m.Text = robtext[i]
-				postMessage(ws, m)
-			}
-
-			switch m.User {
-			case usermap["shriwise"]:
-				i := rand.Intn(len(pattext))
-				m.Text = pattext[i]
-				postMessage(ws, m)
-			case usermap["r"]:
-				m.Text = "Hi Robert, "
 			}
 		}
 	}
